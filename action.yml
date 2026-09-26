@@ -1,0 +1,67 @@
+name: Send files with Yungle
+description: Send build artefacts to a client as a private, EU-hosted Yungle transfer, and get the link back.
+author: Yungle
+branding:
+  icon: send
+  color: green
+
+inputs:
+  api-key:
+    description: A Yungle API key with the transfers:write scope. Store it as a secret; it works on the free plan.
+    required: true
+  path:
+    description: Files or directories to send, one per line. Directories are sent with their structure.
+    required: true
+  to:
+    description: Recipient email addresses, comma- or newline-separated. Leave empty to only get a link.
+    required: false
+    default: ''
+  message:
+    description: A note for the recipients.
+    required: false
+    default: ''
+  title:
+    description: A label for your dashboard. Recipients never see it.
+    required: false
+    default: ''
+  expires:
+    description: Lifetime in days, clamped to your plan (7 on free).
+    required: false
+    default: ''
+  password:
+    description: Recipients must enter this to download. Pass it from a secret.
+    required: false
+    default: ''
+  cli-version:
+    description: The yungle-cli version to run.
+    required: false
+    default: '0'
+
+outputs:
+  url:
+    description: The share link.
+    value: ${{ steps.send.outputs.url }}
+  id:
+    description: The transfer id, for the API.
+    value: ${{ steps.send.outputs.id }}
+  expires-at:
+    description: When the link stops working (ISO 8601).
+    value: ${{ steps.send.outputs.expires-at }}
+
+runs:
+  using: composite
+  steps:
+    - id: send
+      shell: bash
+      env:
+        YUNGLE_API_KEY: ${{ inputs.api-key }}
+        INPUT_PATH: ${{ inputs.path }}
+        INPUT_TO: ${{ inputs.to }}
+        INPUT_MESSAGE: ${{ inputs.message }}
+        INPUT_TITLE: ${{ inputs.title }}
+        INPUT_EXPIRES: ${{ inputs.expires }}
+        INPUT_PASSWORD: ${{ inputs.password }}
+        INPUT_CLI_VERSION: ${{ inputs.cli-version }}
+      # Inputs travel as environment variables, never interpolated into the
+      # script, so a title or message cannot inject shell.
+      run: node "$GITHUB_ACTION_PATH/send.mjs"
