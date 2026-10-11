@@ -37,6 +37,6 @@ store it as the `YUNGLE_API_KEY` secret.
 `url`, `id`, `expires-at`. A summary with the link is added to the run.
 
 Runs [`yungle-cli`](https://github.com/heindewilde/yungle-clients) under the hood.
-Docs: <https://yungle.co/developers/recipes/ci-artefacts?ref=github-action>
+Docs: <https://docs.yungle.co/guides/send-from-ci?ref=github-action>
 
 MIT
